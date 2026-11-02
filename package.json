@@ -3,9 +3,6 @@
   "version": "0.1.0",
   "description": "Git status, branch graph and GitHub org search",
   "main": "out/main/index.js",
-  "directories": {
-    "doc": "docs"
-  },
   "scripts": {
     "dev": "electron-vite dev",
     "build": "electron-vite build",

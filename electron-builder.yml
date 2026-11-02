@@ -1,0 +1,9 @@
+appId: es.hefame.gitstatuskraken
+productName: GitStatusKraken
+directories:
+  output: dist
+files:
+  - out/**
+  - package.json
+win:
+  target: portable
