@@ -22,8 +22,8 @@ test('snapshot: repo without snapshot branches -> missing', () => {
   expect(summarizeSnapshots([])).toEqual({ status: 'missing', mergedInto: [] })
 })
 
-test('snapshot: a compare that failed (null) is ignored, not counted as merged', () => {
-  expect(summarizeSnapshots([{ name: 'x-snapshot', comparison: null }])).toEqual({ status: 'missing', mergedInto: [] })
+test('snapshot: a compare that failed (null) is unknown, never merged', () => {
+  expect(summarizeSnapshots([{ name: 'x-snapshot', comparison: null }])).toEqual({ status: 'unknown', mergedInto: [] })
 })
 
 test('isSnapshotBranch is case-insensitive', () => {

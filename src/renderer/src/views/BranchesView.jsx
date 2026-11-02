@@ -9,7 +9,8 @@ import { formatDate } from '../util/time.js'
 const STATUS = {
   merged: { icon: '✅', label: 'Mergeada' },
   'not-merged': { icon: '❌', label: 'No mergeada' },
-  missing: { icon: '—', label: 'No existe' }
+  missing: { icon: '—', label: 'No existe' },
+  unknown: { icon: '⚠️', label: 'No se pudo comparar' }
 }
 
 const StatusIcon = ({ status, detail }) => (

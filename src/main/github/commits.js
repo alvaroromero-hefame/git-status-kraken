@@ -1,4 +1,4 @@
-import { listOrgRepos, estimateRequests, REQUEST_WARNING_THRESHOLD } from './repos.js'
+import { listReposForOrgs, estimateRequests, REQUEST_WARNING_THRESHOLD } from './repos.js'
 import { mapLimit } from './pool.js'
 import { classifyError } from './errors.js'
 
@@ -67,7 +67,7 @@ export async function searchCommits(octokit, { orgs, login, since, until, confir
   const { user } = await octokit.graphql('query($login: String!) { user(login: $login) { id } }', { login })
   if (!user) throw new Error(`No existe el usuario de GitHub "${login}"`)
 
-  const repos = (await Promise.all(orgs.map(org => listOrgRepos(octokit, org, since)))).flat()
+  const { repos, orgFailures } = await listReposForOrgs(octokit, orgs, since)
   const estimate = estimateRequests(repos.length)
   if (estimate > REQUEST_WARNING_THRESHOLD && !confirmed) return { needsConfirm: true, estimate }
 
@@ -84,7 +84,7 @@ export async function searchCommits(octokit, { orgs, login, since, until, confir
 
   return {
     rows: dedupeCommits(results.filter(Boolean).flat()),
-    failures: failures.map(f => ({ repo: `${f.item.org}/${f.item.name}`, message: classifyError(f.error).message })),
+    failures: [...orgFailures, ...failures.map(f => ({ repo: `${f.item.org}/${f.item.name}`, message: classifyError(f.error).message }))],
     rateLimitRemaining: state.rateLimitRemaining,
     cancelled: Boolean(signal?.aborted)
   }

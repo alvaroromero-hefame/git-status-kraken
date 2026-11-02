@@ -35,11 +35,16 @@ export async function getCommitDetail(cwd, sha) {
   if (!SHA_RE.test(sha)) throw new Error('SHA inválido')
   const head = await runGit(cwd, ['show', '-s', '--format=%H%x1f%an%x1f%ae%x1f%aI%x1f%B', sha, '--'])
   const [fullSha, author, email, date, message] = head.split('\x1f')
-  const names = await runGit(cwd, ['show', '--name-status', '--format=', sha, '--'])
-  const files = names.split('\n').filter(Boolean).map(line => {
-    const parts = line.split('\t')
-    // Renames/copies are "R100\told\tnew": show the new path.
-    return { status: parts[0][0], path: parts[parts.length - 1] }
-  })
+  // -z keeps accents, spaces and quotes in paths raw (no octal escaping).
+  const tokens = (await runGit(cwd, ['show', '-z', '--name-status', '--format=', sha, '--'])).split('\0')
+  const files = []
+  for (let i = 0; i < tokens.length; i++) {
+    const status = tokens[i].trim()
+    if (!status) continue
+    // Renames/copies are "R100\0old\0new": show the new path.
+    const pathIndex = /^[RC]/.test(status) ? i + 2 : i + 1
+    files.push({ status: status[0], path: tokens[pathIndex] })
+    i = pathIndex
+  }
   return { sha: fullSha, author, email, date, message: message.trim(), files }
 }

@@ -21,6 +21,8 @@ function createWindow() {
       sandbox: true
     }
   })
+  // The window never navigates away (e.g. a dropped file/URL): a foreign page would get window.api.
+  win.webContents.on('will-navigate', e => e.preventDefault())
   // Links never open inside the app window.
   win.webContents.setWindowOpenHandler(({ url }) => {
     if (url.startsWith('https://')) shell.openExternal(url)

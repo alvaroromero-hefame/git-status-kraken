@@ -1,4 +1,4 @@
-import { listOrgRepos, estimateRequests, REQUEST_WARNING_THRESHOLD } from './repos.js'
+import { listReposForOrgs, estimateRequests, REQUEST_WARNING_THRESHOLD } from './repos.js'
 import { mapLimit } from './pool.js'
 import { classifyError } from './errors.js'
 
@@ -13,11 +13,19 @@ export function mergeStatus(comparison) {
 }
 
 /** Snapshot rule (decided with Álvaro): merged if contained in ANY branch whose name contains "snapshot". */
+// A null comparison means the compare itself failed: that is "unknown", never "merged" or "missing".
 export function summarizeSnapshots(comparisons) {
-  const known = comparisons.filter(c => c.comparison)
-  if (!known.length) return { status: 'missing', mergedInto: [] }
-  const mergedInto = known.filter(c => c.comparison.behindBy === 0).map(c => c.name)
-  return { status: mergedInto.length ? 'merged' : 'not-merged', mergedInto }
+  if (!comparisons.length) return { status: 'missing', mergedInto: [] }
+  const mergedInto = comparisons.filter(c => c.comparison?.behindBy === 0).map(c => c.name)
+  if (mergedInto.length) return { status: 'merged', mergedInto }
+  const anyUnknown = comparisons.some(c => !c.comparison)
+  return { status: anyUnknown ? 'unknown' : 'not-merged', mergedInto: [] }
+}
+
+function releaseStatus(defaultBranch, isDefault, comparison) {
+  if (!defaultBranch) return 'missing'
+  if (isDefault) return 'merged'
+  return comparison ? mergeStatus(comparison) : 'unknown'
 }
 
 export const isSnapshotBranch = name => /snapshot/i.test(name)
@@ -25,16 +33,32 @@ export const isSnapshotBranch = name => /snapshot/i.test(name)
 /** How many matching branches fit in one compare query, given one compare per snapshot branch plus the default branch. */
 export const chunkSize = snapshotCount => Math.max(1, Math.floor(MAX_COMPARES_PER_QUERY / (snapshotCount + 1)))
 
-const MATCHES_QUERY = `query($owner: String!, $name: String!, $text: String!) {
+const REFS_QUERY = `query($owner: String!, $name: String!, $q: String!, $cursor: String) {
   repository(owner: $owner, name: $name) {
     defaultBranchRef { name }
-    matches: refs(refPrefix: "refs/heads/", query: $text, first: 100) {
+    refs(refPrefix: "refs/heads/", query: $q, first: 100, after: $cursor) {
+      pageInfo { hasNextPage endCursor }
       nodes { name target { ... on Commit { committedDate } } }
     }
-    snaps: refs(refPrefix: "refs/heads/", query: "snapshot", first: 100) { nodes { name } }
   }
   rateLimit { remaining }
 }`
+
+/** All branches whose name matches q (GitHub substring match), following every page. */
+async function listRefs(octokit, repo, q, state) {
+  const refs = []
+  let defaultBranch = null
+  let cursor = null
+  do {
+    const res = await octokit.graphql(REFS_QUERY, { owner: repo.org, name: repo.name, q, cursor })
+    state.rateLimitRemaining = res.rateLimit.remaining
+    defaultBranch = res.repository.defaultBranchRef?.name ?? null
+    refs.push(...res.repository.refs.nodes)
+    const info = res.repository.refs.pageInfo
+    cursor = info.hasNextPage ? info.endCursor : null
+  } while (cursor)
+  return { refs, defaultBranch }
+}
 
 // Builds one query comparing each branch in `branches` against the default branch and every snapshot branch.
 // All names travel as variables so quotes or odd characters in branch names cannot break the query.
@@ -69,15 +93,12 @@ async function graphqlPartial(octokit, query, vars) {
 }
 
 async function repoBranches(octokit, repo, text, state) {
-  const res = await octokit.graphql(MATCHES_QUERY, { owner: repo.org, name: repo.name, text })
-  state.rateLimitRemaining = res.rateLimit.remaining
-  const r = res.repository
   const needle = text.toLowerCase()
-  const matches = r.matches.nodes.filter(n => n.name.toLowerCase().includes(needle))
-  if (!matches.length) return []
+  const { refs, defaultBranch } = await listRefs(octokit, repo, text, state)
+  const matches = refs.filter(n => n.name.toLowerCase().includes(needle))
+  if (!matches.length) return [] // most repos stop here: one query each
 
-  const defaultBranch = r.defaultBranchRef?.name ?? null
-  const snaps = r.snaps.nodes.map(n => n.name).filter(isSnapshotBranch)
+  const snaps = (await listRefs(octokit, repo, 'snapshot', state)).refs.map(n => n.name).filter(isSnapshotBranch)
   const rows = []
   const size = chunkSize(snaps.length)
   for (let i = 0; i < matches.length; i += size) {
@@ -94,7 +115,7 @@ async function repoBranches(octokit, repo, text, state) {
         branch: m.name,
         lastCommit: m.target?.committedDate ?? null,
         defaultBranch,
-        release: isDefault ? 'merged' : mergeStatus(node?.d ?? null),
+        release: releaseStatus(defaultBranch, isDefault, node?.d),
         snapshot: summarizeSnapshots(snaps.filter(s => s !== m.name).map(s => ({ name: s, comparison: node?.[`s${snaps.indexOf(s)}`] ?? null })))
       })
     })
@@ -106,7 +127,7 @@ export async function searchBranches(octokit, { orgs, text, confirmed }, signal,
   text = String(text ?? '').trim()
   if (text.length < 2) throw new Error('Escribe al menos 2 caracteres')
 
-  const repos = (await Promise.all(orgs.map(org => listOrgRepos(octokit, org)))).flat()
+  const { repos, orgFailures } = await listReposForOrgs(octokit, orgs)
   const estimate = estimateRequests(repos.length)
   if (estimate > REQUEST_WARNING_THRESHOLD && !confirmed) return { needsConfirm: true, estimate }
 
@@ -123,7 +144,7 @@ export async function searchBranches(octokit, { orgs, text, confirmed }, signal,
 
   return {
     rows: results.filter(Boolean).flat(),
-    failures: failures.map(f => ({ repo: `${f.item.org}/${f.item.name}`, message: classifyError(f.error).message })),
+    failures: [...orgFailures, ...failures.map(f => ({ repo: `${f.item.org}/${f.item.name}`, message: classifyError(f.error).message }))],
     rateLimitRemaining: state.rateLimitRemaining,
     cancelled: Boolean(signal?.aborted)
   }

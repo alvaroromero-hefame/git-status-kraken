@@ -32,6 +32,7 @@ export default function RepoView() {
     }
     setRepoPath(res.path)
     setSelected(null)
+    setData(null) // never show the previous repo's data under the new name if loading fails
     await load()
   }
 

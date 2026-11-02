@@ -1,3 +1,5 @@
+import { classifyError } from './errors.js'
+
 const REPOS_QUERY = `query($org: String!, $cursor: String) {
   organization(login: $org) {
     repositories(first: 100, after: $cursor, isArchived: false, orderBy: { field: PUSHED_AT, direction: DESC }) {
@@ -27,3 +29,15 @@ export async function listOrgRepos(octokit, org, pushedSince) {
 export const estimateRequests = repoCount => repoCount * 2
 
 export const REQUEST_WARNING_THRESHOLD = 1000
+
+/** Repos of several orgs. An org that fails (SSO, typo, no access) goes to orgFailures instead of failing the search. */
+export async function listReposForOrgs(octokit, orgs, pushedSince) {
+  const settled = await Promise.allSettled(orgs.map(org => listOrgRepos(octokit, org, pushedSince)))
+  const repos = []
+  const orgFailures = []
+  settled.forEach((s, i) => {
+    if (s.status === 'fulfilled') repos.push(...s.value)
+    else orgFailures.push({ repo: orgs[i], message: classifyError(s.reason).message })
+  })
+  return { repos, orgFailures }
+}

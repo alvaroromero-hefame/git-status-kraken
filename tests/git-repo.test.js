@@ -38,3 +38,11 @@ test('resolveRepoRoot returns null outside a repo and the root inside one', asyn
 test('getCommitDetail rejects option-like input', async () => {
   await expect(getCommitDetail(dir, '--output=x')).rejects.toThrow('SHA inválido')
 })
+
+test('commit detail keeps accents and spaces in file paths unquoted', async () => {
+  fs.writeFileSync(path.join(dir, 'año nuevo.txt'), 'x')
+  execFileSync('git', ['add', '-A'], { cwd: dir })
+  execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', 'commit', '-qm', 'acentos'], { cwd: dir })
+  const [head] = await getLog(dir)
+  expect((await getCommitDetail(dir, head.sha)).files).toEqual([{ status: 'A', path: 'año nuevo.txt' }])
+})
