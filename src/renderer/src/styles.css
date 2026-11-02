@@ -97,3 +97,11 @@ input[type=text], input[type=password], input[type=date] { background: var(--bg)
 .s-R, .s-C, .s-T { background: var(--lane-4); color: #0d1f1d; }
 .view-slot { flex: 1; min-width: 0; display: flex; }
 .view-slot[hidden] { display: none; }
+
+/* Settings */
+.settings { padding: 20px 24px; max-width: 640px; }
+.settings h2 { font-size: 14px; margin: 0 0 12px; }
+.token-form { display: flex; gap: 8px; align-items: center; }
+.token-form input { flex: 1; }
+.help { margin-top: 24px; color: var(--muted); border-top: 1px solid var(--border); padding-top: 12px; }
+code { background: var(--panel-2); padding: 0 4px; border-radius: 3px; }

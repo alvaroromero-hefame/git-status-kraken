@@ -1,5 +1,6 @@
 import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron'
 import { join } from 'node:path'
+import { registerAuthHandlers } from './github/ipc.js'
 import { resolveRepoRoot, getStatus, getLog, getRefs, getCommitDetail } from './git/repo.js'
 
 let win
@@ -51,6 +52,7 @@ function registerRepoHandlers() {
 
 app.whenReady().then(() => {
   registerRepoHandlers()
+  registerAuthHandlers()
   createWindow()
 })
 app.on('window-all-closed', () => app.quit())

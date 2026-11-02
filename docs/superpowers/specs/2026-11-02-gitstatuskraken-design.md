@@ -174,3 +174,10 @@ Esto sustituye a los algoritmos REST descritos más abajo; la lógica (qué se f
 - La estructura de carpetas y componentes concretos.
 - Los estilos visuales.
 - La paleta de colores de las calles del gráfico.
+
+## Cambio 2026-11-02 (datos reales de las orgs)
+
+Al probar con el token se vio que **ninguna** de las 165 repos tiene una rama llamada exactamente `snapshot` (lo habitual: `vX.Y.Z/snapshot/rcN`, `snapshots/X.Y.Z-SNAPSHOT`) y que 47 usan `main` en vez de `master`. Álvaro decidió:
+- **Snapshot**: la rama está mergeada si está contenida en **alguna** rama cuyo nombre contenga `snapshot` (sin distinguir mayúsculas, excluyendo la propia rama). La tabla muestra en cuáles.
+- **Release**: se compara contra la **rama por defecto** del repo (`master` o `main`). La columna muestra su nombre.
+Esto sustituye a "nombre exacto `snapshot`" y "`master`" de las secciones anteriores.

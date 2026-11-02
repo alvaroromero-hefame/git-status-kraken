@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Sidebar from './components/Sidebar.jsx'
 import RepoView from './views/RepoView.jsx'
+import SettingsView from './views/SettingsView.jsx'
 
 const Placeholder = ({ title }) => (
   <div className="view">
@@ -12,7 +13,7 @@ const VIEWS = {
   repo: RepoView,
   commits: () => <Placeholder title="Mis commits" />,
   branches: () => <Placeholder title="Buscar ramas" />,
-  settings: () => <Placeholder title="Ajustes" />
+  settings: SettingsView
 }
 
 export default function App() {
