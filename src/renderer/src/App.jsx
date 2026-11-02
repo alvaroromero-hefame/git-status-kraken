@@ -2,18 +2,13 @@ import { useState } from 'react'
 import Sidebar from './components/Sidebar.jsx'
 import RepoView from './views/RepoView.jsx'
 import CommitsView from './views/CommitsView.jsx'
+import BranchesView from './views/BranchesView.jsx'
 import SettingsView from './views/SettingsView.jsx'
-
-const Placeholder = ({ title }) => (
-  <div className="view">
-    <div className="topbar"><h1>{title}</h1></div>
-  </div>
-)
 
 const VIEWS = {
   repo: RepoView,
   commits: CommitsView,
-  branches: () => <Placeholder title="Buscar ramas" />,
+  branches: BranchesView,
   settings: SettingsView
 }
 
