@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import Sidebar from './components/Sidebar.jsx'
+import RepoView from './views/RepoView.jsx'
 
 const Placeholder = ({ title }) => (
   <div className="view">
@@ -8,7 +9,7 @@ const Placeholder = ({ title }) => (
 )
 
 const VIEWS = {
-  repo: () => <Placeholder title="Repo local" />,
+  repo: RepoView,
   commits: () => <Placeholder title="Mis commits" />,
   branches: () => <Placeholder title="Buscar ramas" />,
   settings: () => <Placeholder title="Ajustes" />
@@ -16,11 +17,15 @@ const VIEWS = {
 
 export default function App() {
   const [active, setActive] = useState('repo')
-  const View = VIEWS[active]
   return (
     <div className="app">
       <Sidebar active={active} onChange={setActive} />
-      <main className="content"><View /></main>
+      <main className="content">
+        {/* Views stay mounted so an open repo or a finished search survives switching tabs. */}
+        {Object.entries(VIEWS).map(([key, View]) => (
+          <div key={key} className="view-slot" hidden={key !== active}><View /></div>
+        ))}
+      </main>
     </div>
   )
 }

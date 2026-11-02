@@ -35,3 +35,7 @@ test('parseRefs groups heads, remotes (minus */HEAD), tags', () => {
   const raw = 'refs/heads/main\x1f1\nrefs/remotes/origin/HEAD\x1f1\nrefs/remotes/origin/dev\x1f2\nrefs/tags/v1\x1f3\n'
   expect(parseRefs(raw)).toEqual({ local: [{ name: 'main', sha: '1' }], remote: [{ name: 'origin/dev', sha: '2' }], tags: [{ name: 'v1', sha: '3' }] })
 })
+
+test('parseRefs uses the peeled commit for annotated tags', () => {
+  expect(parseRefs('refs/tags/v2\x1ftagobj\x1fcommitsha\n').tags).toEqual([{ name: 'v2', sha: 'commitsha' }])
+})

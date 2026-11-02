@@ -58,12 +58,13 @@ export function parseLog(raw) {
     })
 }
 
-/** Parses `git for-each-ref --format=%(refname)%x1f%(objectname)`. */
+/** Parses `git for-each-ref --format=%(refname)%1f%(objectname)%1f%(*objectname)`. */
 export function parseRefs(raw) {
   const out = { local: [], remote: [], tags: [] }
   for (const line of raw.split('\n')) {
     if (!line) continue
-    const [ref, sha] = line.split('\x1f')
+    const [ref, objectSha, peeledSha] = line.split('\x1f')
+    const sha = peeledSha || objectSha // annotated tags point to a tag object; use its commit
     if (ref.startsWith('refs/heads/')) out.local.push({ name: ref.slice(11), sha })
     else if (ref.startsWith('refs/remotes/') && !ref.endsWith('/HEAD')) out.remote.push({ name: ref.slice(13), sha })
     else if (ref.startsWith('refs/tags/')) out.tags.push({ name: ref.slice(10), sha })

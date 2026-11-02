@@ -44,3 +44,56 @@ button, input, select { font: inherit; color: inherit; }
 .btn:disabled { opacity: .5; cursor: default; }
 input[type=text], input[type=password], input[type=date] { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; }
 .error { color: var(--bad); }
+
+.btn.small { padding: 2px 8px; font-size: 12px; }
+.empty { padding: 40px; color: var(--muted); text-align: center; }
+
+/* Repo view */
+.repo-layout { flex: 1; min-height: 0; display: grid; grid-template-columns: 230px 1fr 340px; }
+.branch-panel { background: var(--panel); border-right: 1px solid var(--border); overflow: auto; padding: 6px 0; }
+.branch-panel summary { padding: 6px 12px; cursor: pointer; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: .04em; color: var(--muted); }
+.branch-panel ul { list-style: none; margin: 0; padding: 0; }
+.ref-btn { width: 100%; text-align: left; background: none; border: 0; padding: 3px 12px 3px 24px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ref-btn:hover { background: var(--panel-2); color: var(--accent); }
+
+.repo-center { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.wip { border-bottom: 1px solid var(--border); background: var(--panel); padding: 8px 12px; }
+.wip-head { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.wip-tag { margin-left: auto; background: var(--panel-2); border: 1px dashed var(--border); border-radius: 10px; padding: 1px 10px; font-size: 12px; }
+.wip-groups { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 6px; }
+.wip-group summary { cursor: pointer; }
+.wip-group ul { margin: 4px 0; padding-left: 18px; max-height: 160px; overflow: auto; font-family: Consolas, monospace; font-size: 12px; }
+.wip-group.staged summary { color: var(--ok); }
+.wip-group.modified summary { color: var(--lane-2); }
+.wip-group.conflicts summary { color: var(--bad); }
+
+.graph { flex: 1; overflow: auto; position: relative; }
+.graph:focus-visible { outline-offset: -2px; }
+.graph-inner { position: relative; }
+.graph-svg { position: absolute; left: 0; top: 0; pointer-events: none; z-index: 1; }
+.graph-row { position: absolute; left: 0; right: 0; display: flex; align-items: center; gap: 10px; padding-right: 12px; cursor: pointer; white-space: nowrap; }
+.graph-row:hover { background: rgba(255,255,255,.04); }
+.graph-row.selected { background: rgba(25,181,165,.18); }
+.graph-refs { display: flex; gap: 4px; flex-shrink: 0; max-width: 40%; overflow: hidden; }
+.graph-subject { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.graph-author { color: var(--muted); width: 140px; overflow: hidden; text-overflow: ellipsis; }
+.graph-date { color: var(--muted); width: 110px; text-align: right; }
+.pill { border-radius: 4px; padding: 0 6px; font-size: 11px; line-height: 18px; background: var(--panel-2); border: 1px solid var(--border); white-space: nowrap; }
+.pill.head { background: var(--accent); color: #0d1f1d; border-color: var(--accent); font-weight: 600; }
+.pill.local { border-color: var(--accent); }
+.pill.remote { opacity: .7; }
+.pill.tag { border-color: var(--lane-2); color: var(--lane-2); }
+
+.detail-panel { background: var(--panel); border-left: 1px solid var(--border); overflow: auto; padding: 12px; }
+.detail-panel h2 { font-size: 12px; text-transform: uppercase; color: var(--muted); margin: 16px 0 6px; }
+.detail-sha { display: flex; gap: 8px; align-items: center; }
+.detail-msg { white-space: pre-wrap; font-size: 14px; }
+.file-list { list-style: none; padding: 0; margin: 0; font-family: Consolas, monospace; font-size: 12px; }
+.file-list li { padding: 2px 0; display: flex; gap: 6px; word-break: break-all; }
+.badge { display: inline-block; width: 18px; text-align: center; border-radius: 3px; font-weight: 700; flex-shrink: 0; }
+.s-A { background: var(--ok); color: #0d1f1d; }
+.s-M { background: var(--lane-2); color: #0d1f1d; }
+.s-D { background: var(--bad); color: #fff; }
+.s-R, .s-C, .s-T { background: var(--lane-4); color: #0d1f1d; }
+.view-slot { flex: 1; min-width: 0; display: flex; }
+.view-slot[hidden] { display: none; }

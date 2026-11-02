@@ -85,7 +85,7 @@
 Commands:
 - status: `git status --porcelain=v2 --branch -z`
 - log: `git log --all --topo-order -n <limit> --format=%H%x1f%P%x1f%an%x1f%aI%x1f%D%x1f%s%x1e`
-- refs: `git for-each-ref --format=%(refname)%x1f%(objectname) refs/heads refs/remotes refs/tags`
+- refs: `git for-each-ref --format=%(refname)%1f%(objectname) refs/heads refs/remotes refs/tags`
 - detail: `git show -s --format=%H%x1f%an%x1f%ae%x1f%aI%x1f%B <sha>`, then `git show --name-status --format= <sha>`
 
 - [ ] **Step 1: Write failing parser tests**

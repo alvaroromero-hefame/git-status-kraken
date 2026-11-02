@@ -27,7 +27,7 @@ export async function getLog(cwd, limit = 500) {
 }
 
 export async function getRefs(cwd) {
-  return parseRefs(await runGit(cwd, ['for-each-ref', '--format=%(refname)%x1f%(objectname)',
+  return parseRefs(await runGit(cwd, ['for-each-ref', '--format=%(refname)%1f%(objectname)%1f%(*objectname)',
     'refs/heads', 'refs/remotes', 'refs/tags']))
 }
 

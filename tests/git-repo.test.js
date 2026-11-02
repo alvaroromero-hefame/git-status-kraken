@@ -27,6 +27,7 @@ test('untracked file, then commit, then detail', async () => {
   const detail = await getCommitDetail(dir, log[0].sha)
   expect(detail.files).toEqual([{ status: 'A', path: 'a.txt' }])
   expect(detail).toMatchObject({ sha: log[0].sha, author: 't', email: 't@t', message: 'first' })
+  expect((await getRefs(dir)).local).toEqual([{ name: 'main', sha: log[0].sha }])
 })
 
 test('resolveRepoRoot returns null outside a repo and the root inside one', async () => {

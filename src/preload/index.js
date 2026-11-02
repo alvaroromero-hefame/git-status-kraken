@@ -1,3 +1,9 @@
-import { contextBridge } from 'electron'
+import { contextBridge, ipcRenderer } from 'electron'
 
-contextBridge.exposeInMainWorld('api', {})
+contextBridge.exposeInMainWorld('api', {
+  repo: {
+    choose: () => ipcRenderer.invoke('repo:choose'),
+    load: () => ipcRenderer.invoke('repo:load'),
+    detail: sha => ipcRenderer.invoke('repo:detail', sha)
+  }
+})
