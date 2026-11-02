@@ -12,6 +12,13 @@ contextBridge.exposeInMainWorld('api', {
     clear: () => ipcRenderer.invoke('auth:clear')
   },
   gh: {
-    orgs: () => ipcRenderer.invoke('gh:orgs')
+    orgs: () => ipcRenderer.invoke('gh:orgs'),
+    cancel: jobId => ipcRenderer.invoke('gh:cancel', jobId),
+    openExternal: url => ipcRenderer.invoke('gh:open', url),
+    onProgress: cb => {
+      const listener = (_e, p) => cb(p)
+      ipcRenderer.on('job:progress', listener)
+      return () => ipcRenderer.removeListener('job:progress', listener)
+    }
   }
 })

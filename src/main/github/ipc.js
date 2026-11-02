@@ -1,4 +1,5 @@
-import { ipcMain } from 'electron'
+import { ipcMain, shell } from 'electron'
+import { cancelJob } from './jobs.js'
 import { classifyError } from './errors.js'
 import { getOctokit, createOctokit, resetOctokit } from './client.js'
 import { saveToken, clearToken } from '../token.js'
@@ -44,5 +45,9 @@ export function registerAuthHandlers() {
   handle('gh:orgs', async () => {
     const orgs = await requireOctokit().paginate('GET /user/orgs', { per_page: 100 })
     return [...new Set([...DEFAULT_ORGS, ...orgs.map(o => o.login)])]
+  })
+  ipcMain.handle('gh:cancel', (_e, jobId) => cancelJob(jobId))
+  ipcMain.handle('gh:open', (_e, url) => {
+    if (typeof url === 'string' && url.startsWith('https://github.com/')) shell.openExternal(url)
   })
 }
