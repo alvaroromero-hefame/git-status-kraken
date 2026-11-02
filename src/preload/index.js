@@ -13,6 +13,7 @@ contextBridge.exposeInMainWorld('api', {
   },
   gh: {
     orgs: () => ipcRenderer.invoke('gh:orgs'),
+    searchCommits: (jobId, params) => ipcRenderer.invoke('gh:searchCommits', jobId, params),
     cancel: jobId => ipcRenderer.invoke('gh:cancel', jobId),
     openExternal: url => ipcRenderer.invoke('gh:open', url),
     onProgress: cb => {
