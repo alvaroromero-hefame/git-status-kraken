@@ -1,0 +1,46 @@
+:root {
+  --bg: #1b1d23;
+  --panel: #23262e;
+  --panel-2: #2b2f38;
+  --border: #363b46;
+  --text: #e3e6ec;
+  --muted: #8c93a3;
+  --accent: #19b5a5;
+  --ok: #3fbf6f;
+  --bad: #e5534b;
+  --lane-0: #19b5a5;
+  --lane-1: #e5534b;
+  --lane-2: #f0b429;
+  --lane-3: #7c6cf2;
+  --lane-4: #3fa7f5;
+  --lane-5: #ef6ab0;
+  --lane-6: #8bd450;
+  --lane-7: #f58b3a;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; margin: 0; }
+body { background: var(--bg); color: var(--text); font: 13px/1.4 'Segoe UI', system-ui, sans-serif; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+.app { display: flex; height: 100%; }
+.sidebar { width: 56px; background: var(--panel); border-right: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; padding-top: 8px; gap: 4px; }
+.nav-btn { width: 40px; height: 40px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; display: grid; place-items: center; }
+.nav-btn:hover { background: var(--panel-2); color: var(--text); }
+.nav-btn.active { background: var(--panel-2); color: var(--accent); box-shadow: inset 3px 0 0 var(--accent); }
+.nav-btn:last-child { margin-top: auto; margin-bottom: 8px; }
+
+.content { flex: 1; min-width: 0; display: flex; }
+.view { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.topbar { display: flex; align-items: center; gap: 12px; padding: 8px 14px; background: var(--panel); border-bottom: 1px solid var(--border); min-height: 48px; }
+.topbar h1 { font-size: 15px; font-weight: 600; margin: 0; }
+.muted { color: var(--muted); }
+
+.btn { background: var(--panel-2); border: 1px solid var(--border); border-radius: 6px; padding: 5px 12px; cursor: pointer; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #0d1f1d; font-weight: 600; }
+.btn:disabled { opacity: .5; cursor: default; }
+input[type=text], input[type=password], input[type=date] { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; padding: 5px 8px; }
+.error { color: var(--bad); }

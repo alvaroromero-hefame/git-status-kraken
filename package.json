@@ -1,0 +1,29 @@
+{
+  "name": "gitstatuskraken",
+  "version": "0.1.0",
+  "description": "Git status, branch graph and GitHub org search",
+  "main": "out/main/index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "test": "vitest run",
+    "dist": "electron-vite build && electron-builder --win portable"
+  },
+  "author": "Alvaro Romero",
+  "devDependencies": {
+    "@vitejs/plugin-react": "^6.2.1",
+    "electron": "^45.2.1",
+    "electron-builder": "^26.18.0",
+    "electron-vite": "^6.0.0",
+    "vite": "^8.3.5",
+    "vitest": "^5.0.5"
+  },
+  "dependencies": {
+    "@octokit/rest": "^22.0.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  }
+}
